@@ -1,41 +1,65 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, BookOpen, Calendar, TrendingUp } from "lucide-react"
+import { useAttendance } from "@/hooks/useAttendance"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const DashboardStats = () => {
-  const stats = [
+  const { getDashboardStats } = useAttendance()
+  const { data: stats, isLoading } = getDashboardStats()
+
+  const statItems = [
     {
       title: "Total Students",
-      value: "248",
+      value: stats?.totalStudents?.toString() || "0",
       icon: Users,
-      change: "+12%",
+      change: "Active",
       changeType: "increase" as const,
     },
     {
       title: "Active Classes",
-      value: "15",
+      value: stats?.totalClasses?.toString() || "0",
       icon: BookOpen,
-      change: "+2",
+      change: "Running",
       changeType: "increase" as const,
     },
     {
-      title: "Today's Attendance",
-      value: "89%",
+      title: "Present Today",
+      value: stats?.presentToday?.toString() || "0",
       icon: Calendar,
-      change: "+5%",
+      change: "Students",
       changeType: "increase" as const,
     },
     {
-      title: "Weekly Average",
-      value: "92%",
+      title: "Attendance Rate",
+      value: `${stats?.attendanceRate || 0}%`,
       icon: TrendingUp,
-      change: "+3%",
+      change: "Today",
       changeType: "increase" as const,
     },
   ]
 
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i} className="shadow-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-16 mb-2" />
+              <Skeleton className="h-3 w-24" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      {stats.map((stat, index) => {
+      {statItems.map((stat, index) => {
         const Icon = stat.icon
         return (
           <Card key={index} className="shadow-card hover:shadow-elevated transition-all duration-300">
@@ -49,7 +73,7 @@ const DashboardStats = () => {
               <div className="text-2xl font-bold mb-1">{stat.value}</div>
               <p className="text-xs text-success flex items-center">
                 <TrendingUp className="h-3 w-3 mr-1" />
-                {stat.change} from last week
+                {stat.change}
               </p>
             </CardContent>
           </Card>

@@ -1,7 +1,10 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Users, BookOpen, Calendar, BarChart3, Menu } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Users, BookOpen, Calendar, BarChart3, Menu, Bell, LogOut } from "lucide-react"
 import { useState } from "react"
+import { useAuth } from "@/hooks/useAuth"
 
 interface NavigationProps {
   currentView: string
@@ -10,6 +13,7 @@ interface NavigationProps {
 
 const Navigation = ({ currentView, onViewChange }: NavigationProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { user, signOut } = useAuth()
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
@@ -42,6 +46,27 @@ const Navigation = ({ currentView, onViewChange }: NavigationProps) => {
               )
             })}
           </div>
+        </div>
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" size="sm" className="relative">
+            <Bell className="h-4 w-4" />
+            <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs">
+              3
+            </Badge>
+          </Button>
+          
+          {user && (
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                  {user.email?.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <Button variant="ghost" size="sm" onClick={signOut}>
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </nav>
 
